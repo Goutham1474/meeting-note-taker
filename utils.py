@@ -1,9 +1,8 @@
 import time
 import subprocess
-from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
 from dotenv import load_dotenv
 import os
 
@@ -12,10 +11,11 @@ load_dotenv()
 driver_path = os.getenv('driver_path')
 email = os.getenv('email')
 password = os.getenv('password')
-meet_url = os.getenv('mee_url')
+meet_url = os.getenv('meet_url')
 
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")
+options = uc.ChromeOptions()
+
+# options.add_argument("--headless")  # Uncomment if you want headless mode
 options.add_argument("--disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-gpu")
@@ -23,30 +23,40 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--window-size=1920x1080")
 
-driver = webdriver.Chrome(service=Service(driver_path), options=options)
+options.add_experimental_option("prefs", {
+    "profile.default_content_setting_values.media_stream_camera": 2,  # Disable camera
+    "profile.default_content_setting_values.media_stream_mic": 2,     # Disable microphone
+    "profile.default_content_setting_values.notifications": 2         # Disable notifications
+})
+
+
+driver = uc.Chrome(options=options, driver_executable_path=driver_path)
 
 def login_to_google(email, password):
     driver.get("https://accounts.google.com/signin")
     email_field = driver.find_element(By.ID, "identifierId")
     email_field.send_keys(email)
     email_field.send_keys(Keys.RETURN)
-    time.sleep(2)
-    password_field = driver.find_element(By.NAME, "password")
+    time.sleep(5)
+    password_field = driver.find_element(By.NAME, "Passwd")
     password_field.send_keys(password)
     password_field.send_keys(Keys.RETURN)
     time.sleep(5)
 
 def join_google_meet(meet_url):
     driver.get(meet_url)
-    time.sleep(5)
-    driver.find_element(By.XPATH, '//*[contains(@aria-label, "Turn off microphone")]').click()
-    driver.find_element(By.XPATH, '//*[contains(@aria-label, "Turn off camera")]').click()
     time.sleep(2)
-    join_button = driver.find_element(By.XPATH, '//*[contains(text(), "Join now")]')
+
+    # driver.find_element(By.XPATH, '//*[@aria-label="Turn off microphone"]').click()
+    # driver.find_element(By.XPATH, '//*[@aria-label="Turn on camera"]').click()
+    meeting_name = driver.find_element(By.ID, 'c16')
+    meeting_name.send_keys("Meeting Bot")
+    time.sleep(2)
+    join_button = driver.find_element(By.XPATH, '//*[text()="Ask to join"]')
     join_button.click()
     time.sleep(5)
 
-def start_ffmpeg_recording(output_file="output.mp4"):
+def start_ffmpeg_recording(output_file="meeting_recording.mp4"):
     command = [
         'ffmpeg', '-y', '-f', 'x11grab', '-video_size', '1920x1080', '-i', ':99.0',
         '-f', 'pulse', '-i', 'default', '-c:v', 'libx264', '-preset', 'fast', output_file
@@ -56,10 +66,10 @@ def start_ffmpeg_recording(output_file="output.mp4"):
 def stop_ffmpeg_recording(process):
     process.terminate()
 
-ffmpeg_process = start_ffmpeg_recording("meeting_recording.mp4")
+# ffmpeg_process = start_ffmpeg_recording("meeting_recording.mp4")
 
-login_to_google(email, password)
+# login_to_google(email, password)
 join_google_meet(meet_url)
 time.sleep(3600)
-stop_ffmpeg_recording(ffmpeg_process)
+# stop_ffmpeg_recording(ffmpeg_process)
 driver.quit()
