@@ -2,7 +2,6 @@ import time
 import subprocess
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
 import os
 
@@ -14,62 +13,87 @@ password = os.getenv('password')
 meet_url = os.getenv('meet_url')
 
 options = uc.ChromeOptions()
-
-# options.add_argument("--headless")  # Uncomment if you want headless mode
+options.add_argument("--headless=new")
 options.add_argument("--disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--window-size=1920x1080")
+options.add_argument("--disable-popup-blocking")
+options.add_argument("--ignore-certificate-errors")
+options.add_argument("--disable-save-password-bubble")
 
 options.add_experimental_option("prefs", {
-    "profile.default_content_setting_values.media_stream_camera": 2,  # Disable camera
-    "profile.default_content_setting_values.media_stream_mic": 2,     # Disable microphone
-    "profile.default_content_setting_values.notifications": 2         # Disable notifications
+    "profile.default_content_setting_values.media_stream_camera": 1,
+    "profile.default_content_setting_values.media_stream_mic": 1,
+    "profile.default_content_setting_values.notifications": 1
 })
 
+driver = uc.Chrome(options=options, use_subprocess=True)
 
-driver = uc.Chrome(options=options, driver_executable_path=driver_path)
-
-def login_to_google(email, password):
-    driver.get("https://accounts.google.com/signin")
-    email_field = driver.find_element(By.ID, "identifierId")
-    email_field.send_keys(email)
-    email_field.send_keys(Keys.RETURN)
-    time.sleep(5)
-    password_field = driver.find_element(By.NAME, "Passwd")
-    password_field.send_keys(password)
-    password_field.send_keys(Keys.RETURN)
-    time.sleep(5)
-
-def join_google_meet(meet_url):
-    driver.get(meet_url)
-    time.sleep(2)
-
-    # driver.find_element(By.XPATH, '//*[@aria-label="Turn off microphone"]').click()
-    # driver.find_element(By.XPATH, '//*[@aria-label="Turn on camera"]').click()
-    meeting_name = driver.find_element(By.ID, 'c16')
-    meeting_name.send_keys("Meeting Bot")
-    time.sleep(2)
-    join_button = driver.find_element(By.XPATH, '//*[text()="Ask to join"]')
-    join_button.click()
-    time.sleep(5)
-
-def start_ffmpeg_recording(output_file="meeting_recording.mp4"):
+def start_ffmpeg_recording(output_file):
     command = [
-        'ffmpeg', '-y', '-f', 'x11grab', '-video_size', '1920x1080', '-i', ':99.0',
-        '-f', 'pulse', '-i', 'default', '-c:v', 'libx264', '-preset', 'fast', output_file
+        'ffmpeg',
+        '-y',  # Overwrite output files without asking
+        '-f', 'x11grab',  # For Linux; use 'gdigrab' for Windows
+        '-s', '1920x1080',  # Screen resolution
+        '-i', ':0.0',  # Display address (':0.0' for Linux; on Windows you might use the window ID)
+        '-c:v', 'libx264',
+        '-r', '30',  # Frames per second
+        output_file
     ]
-    return subprocess.Popen(command)
+    return subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def stop_ffmpeg_recording(process):
     process.terminate()
 
-# ffmpeg_process = start_ffmpeg_recording("meeting_recording.mp4")
+def join_google_meet(meet_url):
+    driver.get(meet_url)
+    time.sleep(10)
+    
+    driver.execute_script('''
+        const micButton = document.querySelector('[aria-label="Turn off microphone"]');
+        const cameraButton = document.querySelector('[aria-label="Turn off camera"]');
+        if (micButton) micButton.click();
+        if (cameraButton) cameraButton.click();
+    ''')
 
-# login_to_google(email, password)
+    try:
+        meeting_name = driver.find_element(By.XPATH, '//*[@aria-label="Your name"]')
+        meeting_name.send_keys("Meeting Bot")
+    except Exception as e:
+        print("No name input required", e)
+    
+    time.sleep(2)
+    
+    try:
+        join_button = driver.find_element(By.XPATH, '//*[text()="Ask to join"]')
+        join_button.click()
+    except Exception as e:
+        print("Join button not found", e)
+    
+    time.sleep(5)
+
+def check_participants():
+    participants_xpath = '//*[@aria-label="Show everyone"]'
+    driver.find_element(By.XPATH, participants_xpath).click()
+    time.sleep(2)
+    participants_list_xpath = '//*[@role="listitem"]'
+    participants = driver.find_elements(By.XPATH, participants_list_xpath)
+    driver.find_element(By.XPATH, participants_xpath).click()
+    return len(participants)
+
 join_google_meet(meet_url)
-time.sleep(3600)
-# stop_ffmpeg_recording(ffmpeg_process)
-driver.quit()
+ffmpeg_process = start_ffmpeg_recording("meeting_recording.mp4")
+
+try:
+    while True:
+        participants_count = check_participants()
+        print(f"Participants: {participants_count}")
+        if participants_count <= 1:
+            break
+        time.sleep(10)
+finally:
+    stop_ffmpeg_recording(ffmpeg_process)
+    driver.quit()
