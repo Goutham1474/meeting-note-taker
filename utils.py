@@ -117,5 +117,5 @@ def cleanup():
     except Exception as e:
         print(f"Error closing Chrome: {e}")
 
-if __name__ == "__main__":
-    asyncio.run(record_meeting("https://meet.google.com/wqq-eaji-kig", duration=15, output_filename="audio/meeting_audio.wav"))
+# if __name__ == "__main__":
+#     asyncio.run(record_meeting("https://meet.google.com/wqq-eaji-kig", duration=15, output_filename="audio/meeting_audio.wav"))
