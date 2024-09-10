@@ -58,8 +58,19 @@ def get_transcript(audio_file):
 
 def generate_notes(transcript):
     messages = [
-        {"role": "system", "content": "You are a professional meeting note taker."},
-        {"role": "user", "content": ( f"You specialize in writing notes for meetings. You are currently in a meeting with your team. The transcript of the meeting is as follows: {transcript}. Write major bullet points highlighting the major points from the meeting in numbered bullet points." )}
+        {"role": "system", "content": "You are a professional meeting note taker for candidate interviews."},
+        {"role": "user", "content": ( f"""You specialize in writing notes for meetings and are currently in an interview from your team's side. Below is the transcript of the interview: {transcript}. Write major bullet points highlighting the key moments of the interview in the following format:
+                                     
+        Observations:
+            Describe the candidate's overall behavior and performance during the interview in one 4 line paragraph.
+        Strengths:
+            Highlight any positive aspects of the candidate's interview performance.
+        Weaknesses:
+            Detail the areas where the candidate underperformed during the interview.
+        Fit for the Role:
+            Provide an overall assessment of the candidate’s suitability for the position based on their interview performance.
+                                     
+        If enough inforamtion cannot be gathered then add a line after each heading's summary that enough information cannot be gathered""" )}
     ]
 
     try:
@@ -74,10 +85,8 @@ def generate_notes(transcript):
         return f"Error: {e}"
 
 def process_meeting_audio(audio_file):
-    # Perform diarization and get individual speaker audio files
     speaker_files = perform_diarization(audio_file)
     
-    # Transcribe each speaker's audio
     transcripts = {}
     for speaker_file in speaker_files:
         speaker = os.path.basename(speaker_file).split('.')[0]
@@ -89,7 +98,6 @@ def process_meeting_audio(audio_file):
     
     return full_transcript, notes
 
-# Example usage
-# if __name__ == "__main__":
-#     full_transcript, notes = process_meeting_audio("audio/meeting_audio.wav")
-#     print(notes)
+# full_transcript, notes = process_meeting_audio("audio/meeting_audio.wav")
+# print(notes)
+# print(generate_notes('sorry but im not a good candidate. ok you can leave the meeting'))
