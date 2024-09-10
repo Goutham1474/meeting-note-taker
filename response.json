@@ -1,0 +1,21 @@
+{
+    "Overall_Observation": "The candidate showed a decent understanding of Python basics and demonstrated some practical experience with AI projects. However, there were gaps in knowledge regarding certain Python concepts and language features. The candidate struggled with some technical questions but was able to provide explanations for others. Overall, the performance was average with room for improvement in certain areas.",
+    "Strengths": [
+        "Practical experience with AI projects",
+        "Able to explain concepts like the difference between list and tuple"
+    ],
+    "Weaknesses": [
+        "Lack of knowledge on certain Python concepts and language features",
+        "Struggled with technical questions and some fundamental Python concepts"
+    ],
+    "Fit for the role": "The candidate may require additional training and guidance to strengthen their technical knowledge and skills before being fully fit for the AI developer role.",
+    "intents": {
+        "Tell me something about yourself briefly": "The candidate effectively highlighted their interest in AI and practical experience with AI projects.",
+        "What are the key features of Python": "The candidate struggled to provide a comprehensive answer, indicating a need for further understanding of Python basics.",
+        "What is the purpose of self parameter in Python classes": "The candidate was unable to answer this question, revealing a gap in knowledge of Python classes and object-oriented programming.",
+        "How does exception handling work in Python": "The candidate provided a basic explanation of exception handling, showing some understanding of error management in Python.",
+        "What are list comprehension in Python": "The candidate was unable to explain list comprehension, indicating a lack of familiarity with this Python feature.",
+        "Why Python is considered an interpreted language": "The candidate lacked an understanding of Python being an interpreted language, suggesting a gap in knowledge of Python fundamentals.",
+        "What is the difference between list and tuple": "The candidate confidently explained the difference between list and tuple, showcasing a clear understanding of basic Python data structures."
+    }
+}

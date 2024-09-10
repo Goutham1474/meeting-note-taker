@@ -22,7 +22,7 @@ def make_notes(request: MeetRequest):
     asyncio.run(record_meeting(meet_url, duration, output_filename))
     transcript = get_transcript(output_filename)
     notes = generate_notes(transcript)
-    return JSONResponse(content={"notes": notes})
+    return JSONResponse(content=notes)
     
 if __name__ == "__main__":
     uvicorn.run("server:app", port=8080, reload=True)
