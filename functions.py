@@ -113,5 +113,5 @@ def process_meeting_audio(audio_file):
 
 # full_transcript, notes = process_meeting_audio("audio/meeting_audio.wav")
 # print(notes)
-tra = get_transcript('audio/meeting_audio.wav')
-print(generate_notes(tra))
+# tra = get_transcript('audio/meeting_audio.wav')
+# print(generate_notes(tra))

@@ -1,3 +1,4 @@
 .env
 audio/sample_convo.wav
 audio/speakers/*.wav
+__pycache__
