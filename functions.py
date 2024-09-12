@@ -3,7 +3,6 @@ import warnings
 import openai
 import os
 import json
-import re
 from pyannote.audio import Pipeline
 from pydub import AudioSegment
 from dotenv import load_dotenv
@@ -114,4 +113,4 @@ def process_meeting_audio(audio_file):
 # full_transcript, notes = process_meeting_audio("audio/meeting_audio.wav")
 # print(notes)
 # tra = get_transcript('audio/meeting_audio.wav')
-# print(generate_notes(tra))
+print(generate_notes(''))
