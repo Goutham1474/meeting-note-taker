@@ -5,4 +5,4 @@ asyncio
 pydub==0.25.1
 pyannote.audio==3.1.1
 undetected-chromedriver==3.5.5
-whisper==1.1.10
+openai-whisper==1.1.10

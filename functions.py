@@ -13,7 +13,7 @@ client = openai.OpenAI(
     api_key=os.getenv("openai_key")
 )
 
-os.environ["HF_TOKEN"] = os.getenv("hf_key")
+# os.environ["HF_TOKEN"] = os.getenv("hf_key")
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -113,4 +113,4 @@ def process_meeting_audio(audio_file):
 # full_transcript, notes = process_meeting_audio("audio/meeting_audio.wav")
 # print(notes)
 # tra = get_transcript('audio/meeting_audio.wav')
-print(generate_notes(''))
+# print(generate_notes(''))
